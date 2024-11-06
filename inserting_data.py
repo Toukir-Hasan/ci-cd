@@ -1,27 +1,86 @@
 from pymongo import MongoClient
 
-# Connect to MongoDB (replace <username>, <password>, and <cluster_url> for MongoDB Atlas)
-client = MongoClient("mongodb+srv://Toukir:1234@cluster0.c7fq4ik.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")  # For local MongoDB
-# For MongoDB Atlas: client = MongoClient("mongodb+srv://<username>:<password>@<cluster_url>")
+def connect_to_mongo(uri, db_name):
+    """
+    Connect to MongoDB and return the specified database.
+    """
+    client = MongoClient(uri)
+    return client[db_name]
 
-# Create or access databases and collections
-db = client['my_assignment_db']
-user_collection = db['user']
-order_collection = db['order']
+def get_user_data():
+    """
+    Collect user data from input and return a dictionary.
+    """
+    user_account_id = input("Enter user account ID: ")
+    email = input("Enter email: ")
+    delivery_address = input("Enter delivery address: ")
+    
+    return {
+        "user_account_id": user_account_id,
+        "email": email,
+        "delivery_address": delivery_address
+    }
 
-# Sample data for user and order collections
-users = [
-    {"user_account_id": "user123", "email": "user123@example.com", "delivery_address": "123 Maple St"},
-    {"user_account_id": "user456", "email": "user456@example.com", "delivery_address": "456 Oak St"},
-]
+def get_order_data(db):
+    """
+    Collect order data from input and ensure synchronization with user collection.
+    The email and delivery address must match the user data.
+    """
+    user_collection = db['user']
+    
+    while True:
+        user_email = input("Enter user email: ")
+        delivery_address = input("Enter delivery address: ")
+        
+        # Check if the email exists in the user collection
+        user_data = user_collection.find_one({"email": user_email})
+        
+        if user_data:
+            # Check if the provided delivery address matches the stored address
+            if user_data["delivery_address"] == delivery_address:
+                print("Email and delivery address match the existing data.")
+                break
+            else:
+                print("The provided delivery address does not match the existing one. Please try again.")
+        else:
+            print("Email not found in user data. Please enter valid email and delivery address.")
 
-orders = [
-    {"order_id": "order001", "user_email": "user123@example.com", "delivery_address": "123 Maple St", "items": ["item1", "item2"], "status": "under process"},
-    {"order_id": "order002", "user_email": "user456@example.com", "delivery_address": "456 Oak St", "items": ["item3", "item4"], "status": "shipping"},
-]
+    order_id = input("Enter order ID: ")
+    items = input("Enter items (comma-separated): ").split(",")
+    status = input("Enter order status (under process, shipping, delivered): ")
 
-# Insert data into the collections
-user_collection.insert_many(users)
-order_collection.insert_many(orders)
+    return {
+        "order_id": order_id,
+        "user_email": user_email,
+        "delivery_address": delivery_address,
+        "items": [item.strip() for item in items],
+        "status": status
+    }
 
-print("Data inserted successfully!")
+def insert_data(db):
+    """
+    Insert user and order data into MongoDB collections and ensure synchronization.
+    """
+    user_collection = db['user']
+    order_collection = db['order']
+    
+    # Get user and order data from input
+    user_data = get_user_data()
+    
+    # Insert user data (if not exists)
+    if not user_collection.find_one({"user_account_id": user_data["user_account_id"]}):
+        user_collection.insert_one(user_data)
+        print("New user data inserted successfully.")
+    else:
+        print("User already exists. Skipping user data insertion.")
+    
+    # Get and insert order data
+    order_data = get_order_data(db)
+    order_collection.insert_one(order_data)
+    print("Order data inserted successfully!")
+
+# Connect to MongoDB and insert data
+mongo_uri = "mongodb+srv://Toukir:1234@cluster0.c7fq4ik.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"  # Use MongoDB Atlas URI if connecting to Atlas
+db_name = "my_assignment_db"
+db = connect_to_mongo(mongo_uri, db_name)
+insert_data(db)
