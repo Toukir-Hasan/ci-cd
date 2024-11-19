@@ -8,7 +8,7 @@ COPY requirements.txt .
 
 # Ensure pip is up-to-date and install dependencies
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt --index-url https://pypi.org/simple
+RUN pip install -r requirements.txt
 
 
 
