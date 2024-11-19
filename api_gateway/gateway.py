@@ -12,8 +12,8 @@ with open('config.json') as config_file:
     print(P)
 
 # Endpoint URLs for v1 and v2
-USER_V1_URL = 'http://192.168.0.8:5001/v1/user'
-USER_V2_URL = 'http://192.168.0.8:5002/v2/user'
+USER_V1_URL = 'http://192.168.0.18:5001/v1/user'
+USER_V2_URL = 'http://192.168.0.18:5002/v2/user'
 
 @app.route('/user', methods=['POST', 'PUT'])
 def route_user_request():
