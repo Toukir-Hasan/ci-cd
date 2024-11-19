@@ -10,28 +10,33 @@ client = MongoClient("mongodb+srv://Toukir:1234@cluster0.c7fq4ik.mongodb.net/?re
 db = client['my_assignment_db']
 user_collection = db['user']
 
-class User(Resource):
+class UserV2(Resource):
     def post(self):
         """
-        Create a new user.
+        Create a new user (v2) with additional validations or fields.
         """
         user_data = request.get_json()
         if user_collection.find_one({"email": user_data['email']}):
             return {"message": "User already exists"}, 400
         
+        # Additional field checks or default values can be added here
+        user_data.setdefault("status", "active")  # Example: Adding a default status field
         user_collection.insert_one(user_data)
-        return {"message": "User created successfully"}, 201
+        return {"message": "User created successfully", "user_id": str(user_data["_id"])}, 201
 
     def put(self):
         """
-        Update user's email or delivery address.
+        Update user's email or delivery address (v2) with improved validation or handling.
         """
         user_data = request.get_json()
         email = user_data.get('email')
         new_email = user_data.get('new_email')
         new_address = user_data.get('new_delivery_address')
 
-        # Find the user by email and update the fields
+        # Additional validation or logging
+        if not email:
+            return {"message": "Email is required for update"}, 400
+
         user = user_collection.find_one({"email": email})
         if not user:
             return {"message": "User not found"}, 404
@@ -41,12 +46,13 @@ class User(Resource):
             update_fields['email'] = new_email
         if new_address:
             update_fields['delivery_address'] = new_address
-        
+
+        # You could add logging or other logic here for monitoring changes
         user_collection.update_one({"email": email}, {"$set": update_fields})
-        return {"message": "User updated successfully"}, 200
+        return {"message": "User updated successfully with v2"}, 200
 
-
-api.add_resource(User, '/user')
+# Add the resources with versioned endpoints
+api.add_resource(UserV2, '/v2/user')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5002, debug=True)
