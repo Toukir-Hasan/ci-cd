@@ -25,7 +25,7 @@ services:
 
   # Kafka Service
   kafka:
-    image: toukir0/bitnami/kafka:latest
+    image: bitnami/kafka:latest
     container_name: kafka
     environment:
       - KAFKA_BROKER_ID=1
@@ -67,8 +67,8 @@ services:
       context: ./user_microservice
     container_name: user_microservice_v1
     environment:
-      - MONGO_URI=mongodb://127.0.0.1:27017
-      - KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
+      - MONGO_URI=mongodb://4.204.50.56:27017
+      - KAFKA_BOOTSTRAP_SERVERS=4.204.50.56:9092
     depends_on:
       - mongodb
       - kafka
@@ -83,8 +83,8 @@ services:
       context: ./user_microservice_v2
     container_name: user_microservice_v2
     environment:
-      - MONGO_URI=mongodb://127.0.0.1:27017
-      - KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
+      - MONGO_URI=mongodb://4.204.50.56:27017
+      - KAFKA_BOOTSTRAP_SERVERS=4.204.50.56:9092
     depends_on:
       - mongodb
       - kafka
@@ -99,7 +99,7 @@ services:
       context: ./order_microservice
     container_name: order_microservice
     environment:
-      - MONGO_URI=mongodb://127.0.0.1:27017
+      - MONGO_URI=mongodb://4.204.50.56:27017
     depends_on:
       - mongodb
     ports:
@@ -121,6 +121,19 @@ services:
       - "5004:5004"
     networks:
       - microservice_network
+  # consumer System
+  consumer:
+    build:
+      context: ./consumer
+    container_name: consumer
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+      - mongodb
+    networks:
+      - microservice_network
+
 
 volumes:
   mongo-data:

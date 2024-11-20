@@ -16,5 +16,5 @@ COPY . .
 
 EXPOSE 5004
 
-CMD ["python", "user_kafka.py"]
+CMD ["python", "order_kafka.py"]
 
