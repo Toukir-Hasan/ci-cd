@@ -25,12 +25,12 @@ services:
 
   # Kafka Service
   kafka:
-    image: bitnami/kafka:latest
+    image: toukir0/bitnami/kafka:latest
     container_name: kafka
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.18.0.18:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
@@ -46,9 +46,11 @@ services:
     build:
       context: ./api_gateway
     container_name: api_gateway
+    image: api_gateway:latest
     environment:
-      - USER_SERVICE_V1=http://192.18.0.18:5001
-      - USER_SERVICE_V2=http://192.18.0.18:5002
+     - USER_SERVICE_V1=http://user_microservice_v1:5001
+     - USER_SERVICE_V2=http://user_microservice_v2:5002
+
     depends_on:
       - user_microservice_v1
       - user_microservice_v2
@@ -65,8 +67,8 @@ services:
       context: ./user_microservice
     container_name: user_microservice_v1
     environment:
-      - MONGO_URI=mongodb://192.18.0.18:27017
-      - KAFKA_BOOTSTRAP_SERVERS=192.18.0.18:9092
+      - MONGO_URI=mongodb://127.0.0.1:27017
+      - KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
     depends_on:
       - mongodb
       - kafka
@@ -81,8 +83,8 @@ services:
       context: ./user_microservice_v2
     container_name: user_microservice_v2
     environment:
-      - MONGO_URI=mongodb://192.18.0.18:27017
-      - KAFKA_BOOTSTRAP_SERVERS=192.18.0.18:9092
+      - MONGO_URI=mongodb://127.0.0.1:27017
+      - KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
     depends_on:
       - mongodb
       - kafka
@@ -97,7 +99,7 @@ services:
       context: ./order_microservice
     container_name: order_microservice
     environment:
-      - MONGO_URI=mongodb://192.18.0.18:27017
+      - MONGO_URI=mongodb://127.0.0.1:27017
     depends_on:
       - mongodb
     ports:
@@ -111,10 +113,12 @@ services:
       context: ./event_systeem
     container_name: event_systeem
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=192.18.0.18:9092
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - kafka
       - mongodb
+    ports:
+      - "5004:5004"
     networks:
       - microservice_network
 

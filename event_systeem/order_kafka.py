@@ -5,7 +5,7 @@ from pymongo import MongoClient
 # Initialize Kafka consumer
 consumer = KafkaConsumer(
     'user_updates',
-    bootstrap_servers=['192.168.0.8:9092'],
+    bootstrap_servers=['kafka:9092'],
     value_deserializer=lambda m: json.loads(m.decode('utf-8'))
 )
 

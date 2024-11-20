@@ -14,8 +14,9 @@ user_collection = db['user']
 
 # Kafka producer setup
 producer = KafkaProducer(
-    bootstrap_servers=['192.168.0.8:9092'],
+    bootstrap_servers=['kafka:9092'],
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    # api_version=(2, 0, 2)
 )
 
 class User(Resource):
@@ -68,4 +69,4 @@ class User(Resource):
 api.add_resource(User, '/user')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port='5004',pdebug=True)
+    app.run(host='0.0.0.0',port='5004',debug=True)
