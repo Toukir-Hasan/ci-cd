@@ -1,3 +1,5 @@
+name: CI/CD Docker Deployment
+
 on:
   push:
     branches:
