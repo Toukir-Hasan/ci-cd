@@ -22,7 +22,5 @@ jobs:
       run: |
       ssh -v -o StrictHostKeyChecking=no azureuser@4.204.50.56 "
       cd ~/ci-cd &&
-      git pull origin main &&
-      docker-compose down &&
-      docker-compose up --build -d
+      git pull origin main
       "
