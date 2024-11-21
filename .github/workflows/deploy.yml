@@ -1,26 +1,28 @@
-name: CI/CD Docker Deployment
+name: Docker Deploy to Azure VM
 
 on:
   push:
     branches:
-      - main
+      - main  # Change this to your desired branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.AZURE_VM_SSH_KEY }}
 
-    - name: Deploy to VM
-      run: |
-      ssh -v -o StrictHostKeyChecking=no azureuser@4.204.50.56 "
-      cd ~/ci-cd &&
-      git pull origin main
-      "
+      - name: Deploy to Azure VM
+        run: |
+          ssh azureuser@4.204.50.56 << 'EOF'
+          cd /path/to/your/project
+          git pull origin main
+          docker-compose down
+          docker-compose up -d
+          EOF
