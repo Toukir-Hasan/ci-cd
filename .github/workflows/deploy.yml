@@ -20,9 +20,9 @@ jobs:
 
     - name: Deploy to VM
       run: |
-        ssh -o StrictHostKeyChecking=no azureuser@<4.204.50.56> << EOF
-        cd ~/ci-cd
-        git pull origin main
-        docker-compose down
-        docker-compose up --build -d
-        EOF
+        ssh -o StrictHostKeyChecking=no azureuser@4.204.50.56 "
+          cd ~/ci-cd &&
+          git pull origin main &&
+          docker-compose down &&
+          docker-compose up --build -d
+        "
