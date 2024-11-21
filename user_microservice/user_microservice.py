@@ -20,7 +20,7 @@ class User(Resource):
             return {"message": "User already exists"}, 400
         
         user_collection.insert_one(user_data)
-        return {"message": "User created successfully"}, 201
+        return {"message": "User created successfully,hurray"}, 201
 
     def put(self):
         """
