@@ -1,0 +1,28 @@
+name: CI/CD Docker Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to VM
+      run: |
+        ssh -o StrictHostKeyChecking=no azureuser@<VM_IP_ADDRESS> << EOF
+        cd ~/ci-cd
+        git pull origin main
+        docker-compose down
+        docker-compose up --build -d
+        EOF
