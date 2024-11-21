@@ -3,26 +3,29 @@ name: Docker Deploy to Azure VM
 on:
   push:
     branches:
-      - main  # Change this to your desired branch
+      - main  # Specify the branch to trigger the workflow
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code from the repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Step 2: Set up SSH Agent with the private key
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.AZURE_VM_SSH_KEY }}
 
+      # Step 3: Deploy the updated application to the Azure VM
       - name: Deploy to Azure VM
         run: |
-          ssh azureuser@4.204.50.56 << 'EOF'
-          cd /path/to/your/project
-          git pull origin main
-          docker-compose down
-          docker-compose up -d
+          ssh -o StrictHostKeyChecking=no -T azureuser@4.204.50.56 << 'EOF'
+          cd /path/to/your/project  # Navigate to your project directory
+          git pull origin main      # Pull the latest changes
+          docker-compose down       # Stop existing containers
+          docker-compose up -d      # Start containers in detached mode
           EOF
